@@ -147,7 +147,9 @@ document.addEventListener('click', (e) => {
   if (!btn) return;
 
   const action = btn.dataset.action;
-  const id = btn.dataset.field;
+  // Row-action buttons carry the record id in data-id (set by applyData
+  // from the row's data-field="id"), not in the literal data-field value.
+  const id = btn.dataset.id;
 
   switch (action) {
     case 'create-course': {

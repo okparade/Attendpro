@@ -179,6 +179,12 @@ function applyData(scope, data) {
         node.src = value;
       } else if (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA' || node.tagName === 'SELECT') {
         node.value = value;
+      } else if (node.tagName === 'BUTTON' || node.tagName === 'A') {
+        // Action buttons/links carry a record id (e.g. data-field="id"),
+        // not display text — stash it in a data-* attribute so we don't
+        // clobber the visible "Edit"/"Delete"/"Check In" label. Read it
+        // back as node.dataset[key].
+        node.dataset[key] = value;
       } else {
         node.textContent = value;
       }

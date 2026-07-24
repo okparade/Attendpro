@@ -39,9 +39,12 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 # ---------------------------------------------------------------
 app = Flask(__name__)
 
-# TODO: once your frontend has a real URL, tighten this to just that
-# origin, e.g. CORS(app, origins=["https://your-site.example.com"])
-CORS(app)
+# Restrict cross-origin access to the frontend origin(s). Set
+# ALLOWED_ORIGINS to a comma-separated list (e.g.
+# "https://your-site.example.com,http://localhost:8000"); it defaults to
+# localhost for development. Use "*" only if you knowingly want any origin.
+_allowed = os.environ.get("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000")
+CORS(app, origins="*" if _allowed.strip() == "*" else [o.strip() for o in _allowed.split(",") if o.strip()])
 
 # PythonAnywhere (and most hosts) sit behind one reverse proxy, which
 # is what actually lets us read the real client IP from X-Forwarded-For
@@ -63,9 +66,14 @@ SESSION_TTL_SECONDS = 60 * 60  # a session auto-expires 1 hour after it starts
 
 
 def get_client_ip():
-    """The real client IP, trusting exactly one layer of reverse proxy."""
-    if request.access_route:
-        return request.access_route[0]
+    """The real client IP, trusting exactly one layer of reverse proxy.
+
+    ProxyFix(x_for=1) above rewrites request.remote_addr to the address the
+    *single trusted* proxy reported, so we read that. We deliberately do NOT
+    use request.access_route[0] — that's the left-most X-Forwarded-For entry,
+    which the client fully controls and could set to the lecturer's IP to
+    forge an on-network check-in.
+    """
     return request.remote_addr
 
 
@@ -194,4 +202,7 @@ def checkin():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # Debug is OFF unless FLASK_DEBUG is truthy — never expose Werkzeug's
+    # interactive debugger (an RCE vector) on a real deployment.
+    debug = os.environ.get("FLASK_DEBUG", "").strip().lower() in ("1", "true", "yes", "on")
+    app.run(debug=debug, port=int(os.environ.get("PORT", 5000)))

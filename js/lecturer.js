@@ -25,6 +25,15 @@ document.getElementById('logoutBtn')?.addEventListener('click', () => {
   });
 });
 
+/* startedAt may be a Firestore Timestamp or a raw value — normalise to
+   epoch millis for sorting (0 if missing). */
+function sessionMillis(session) {
+  const t = session.startedAt;
+  if (!t) return 0;
+  if (t.toDate) return t.toDate().getTime();
+  return new Date(t).getTime();
+}
+
 async function loadLecturerDashboard() {
   setViewState({ loading: true, error: null });
   try {
@@ -43,9 +52,13 @@ async function loadLecturerDashboard() {
       }),
     ]);
 
-    // Calculate stats from actual data
+    // Calculate stats from actual data. Attendance records don't carry the
+    // lecturer id — only the session does — so link attendance to this
+    // lecturer through the sessions they started.
     const totalStudents = students.length;
-    const lecturerAttendance = attendance.filter(a => a.lecturerStaffId === lecturer.staffId);
+    const mySessions = sessions.filter(s => s.lecturerStaffId === lecturer.staffId);
+    const mySessionIds = new Set(mySessions.map(s => s.sessionId));
+    const lecturerAttendance = attendance.filter(a => mySessionIds.has(a.sessionId));
     const presentCount = lecturerAttendance.filter(a => a.status === 'present').length;
     const attendanceRate = lecturerAttendance.length > 0 ? Math.round((presentCount / lecturerAttendance.length) * 100) : 0;
     const todaysClasses = sessions.filter(s => {
@@ -103,13 +116,22 @@ async function loadLecturerDashboard() {
       }
     }
 
-    // Attendance history table - map lecturer's attendance records
-    const historyRows = lecturerAttendance.map(a => ({
-      courseName: a.courseName || 'Unknown',
-      date: a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate().toLocaleDateString() : new Date(a.timestamp).toLocaleDateString()) : 'Unknown',
-      studentCount: a.studentCount || 0,
-      presentCount: a.presentCount || 0,
-    }));
+    // Attendance history table — one row per session this lecturer ran,
+    // aggregating its per-student check-ins. Only "present" records exist
+    // (a check-in), so absent is the rest of the student body.
+    const historyRows = mySessions
+      .slice()
+      .sort((a, b) => sessionMillis(b) - sessionMillis(a))
+      .map(s => {
+        const present = attendance.filter(a => a.sessionId === s.sessionId && a.status === 'present').length;
+        const started = s.startedAt;
+        return {
+          date: started ? (started.toDate ? started.toDate().toLocaleDateString() : new Date(started).toLocaleDateString()) : 'Unknown',
+          courseCode: s.courseId || 'Unknown',
+          presentCount: present,
+          absentCount: Math.max(totalStudents - present, 0),
+        };
+      });
     renderRows({
       tbody: document.getElementById('historyBody'),
       template: document.getElementById('historyRowTemplate'),
