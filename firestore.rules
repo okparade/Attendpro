@@ -16,9 +16,16 @@ service cloud.firestore {
     // Students self-register (public create). After sign-in they get
     // an anonymous Firebase Auth uid, stored as authUid — only that
     // uid may update its own record from then on.
-    match /students/{matNo} {
+    //
+    // The document id is encodeURIComponent(matNo) (matric numbers can
+    // contain slashes, which Firestore forbids in a doc id), while the
+    // raw value is kept in the matNo field. Rules can't URL-encode, so
+    // we can't assert id == encode(matNo); we just require the matNo
+    // field to be present and forbid pre-setting authUid on create.
+    match /students/{docId} {
       allow read: if true;
-      allow create: if request.resource.data.matNo == matNo
+      allow create: if request.resource.data.matNo is string
+                    && request.resource.data.matNo.size() > 0
                     && !('authUid' in request.resource.data);
       // Allow update if authenticated and either:
       // 1. Setting authUid for the first time, or
