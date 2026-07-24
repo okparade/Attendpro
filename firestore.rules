@@ -28,10 +28,13 @@ service cloud.firestore {
                     && request.resource.data.matNo.size() > 0
                     && !('authUid' in request.resource.data);
       // Allow update if authenticated and either:
-      // 1. Setting authUid for the first time, or
-      // 2. The authenticated user matches the existing authUid
+      // 1. Claiming the record for the first time (no authUid yet), or
+      // 2. The authenticated user matches the existing authUid.
+      // NB: use `!('authUid' in resource.data)` — reading a missing field
+      // errors in rules (denying the write), which previously blocked the
+      // first-time sign-in for every student since none had authUid yet.
       allow update: if request.auth != null && (
-        !resource.data.authUid || request.auth.uid == resource.data.authUid
+        !('authUid' in resource.data) || request.auth.uid == resource.data.authUid
       );
       allow delete: if false;
     }
