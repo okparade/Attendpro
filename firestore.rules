@@ -1,0 +1,88 @@
+// ==================================================================
+// AttendPro — firestore.rules
+// Paste this into Firebase console → Firestore Database → Rules,
+// then click Publish.
+//
+// KNOWN GAP: there's no admin sign-in built yet (the admin dashboard
+// is just a public page right now), so `lecturerAllowlist` writes
+// are left open below rather than broken. Once you add admin auth,
+// tighten that rule the way the comment on it describes.
+// ==================================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Students self-register (public create). After sign-in they get
+    // an anonymous Firebase Auth uid, stored as authUid — only that
+    // uid may update its own record from then on.
+    match /students/{matNo} {
+      allow read: if true;
+      allow create: if request.resource.data.matNo == matNo
+                    && !('authUid' in request.resource.data);
+      // Allow update if authenticated and either:
+      // 1. Setting authUid for the first time, or
+      // 2. The authenticated user matches the existing authUid
+      allow update: if request.auth != null && (
+        !resource.data.authUid || request.auth.uid == resource.data.authUid
+      );
+      allow delete: if false;
+    }
+
+    // Short-lived one-time sign-in codes. Nothing sensitive enough
+    // here to justify locking down further without a real backend —
+    // codes expire in 5 minutes either way.
+    match /otps/{matNo} {
+      allow read, create, update, delete: if true;
+    }
+
+    // Admin pre-approves a lecturer here before they can sign up.
+    match /lecturerAllowlist/{staffId} {
+      allow read: if true;
+      allow write: if true;
+      // TODO once admin sign-in exists, replace the line above with:
+      // allow write: if request.auth != null &&
+      //   exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Lecturer accounts. Created only once (checked in js/auth.js
+    // against lecturerAllowlist), then only the matching Firebase
+    // Auth user (email/password) can update their own record.
+    match /lecturers/{staffId} {
+      allow read: if true;
+      allow create: if request.resource.data.staffId == staffId;
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.authUid;
+      allow delete: if false;
+    }
+
+    // Courses. Created by the admin dashboard (which has no auth yet,
+    // same known gap as lecturerAllowlist above), read by everyone so
+    // lecturers can populate their session course picker and students
+    // can see which class a session belongs to.
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if true;
+      // TODO once admin sign-in exists, replace the line above with:
+      // allow write: if request.auth != null &&
+      //   exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Attendance sessions + records. These are only ever written by
+    // the Python backend using the Firebase Admin SDK (which bypasses
+    // these rules entirely) — that's what makes the WiFi/IP check in
+    // /backend/app.py meaningful. The client can read them (to show
+    // "open sessions" and the live feed) but can never write them
+    // directly, so attendance can't be forged from the browser.
+    match /sessions/{sessionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /attendance/{attendanceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+  }
+}

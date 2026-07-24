@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Lecturer Sign In</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- Branding panel -->
+  <div class="auth-visual">
+    <div class="logo"><i class="fa-solid fa-user-check"></i><h2>AttendPro</h2></div>
+    <div class="pitch">
+      <h1>Welcome back</h1>
+      <p>Sign in with your Staff ID or institutional email and your password.</p>
+    </div>
+    <div class="pitch-foot">&copy; 2026 AttendPro</div>
+  </div>
+
+  <!-- Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+
+      <div class="role-tabs">
+        <a href="student-signin.html">Student</a>
+        <a href="lecturer-signin.html" class="active">Lecturer</a>
+      </div>
+
+      <h1>Lecturer Sign In</h1>
+      <p class="subtitle">Enter your credentials to access your dashboard.</p>
+
+      <div id="formAlert" class="form-alert" hidden></div>
+
+      <form id="lecturerSigninForm" novalidate>
+        <div class="form-group">
+          <label for="identifier">Staff ID or Email</label>
+          <input type="text" id="identifier" name="identifier" data-field="identifier" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input type="password" id="password" name="password" data-field="password" required>
+            <button type="button" class="password-toggle" data-toggle-for="password"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+
+        <p class="auth-switch" style="text-align:right; margin:-8px 0 20px;">
+          <a href="#" id="forgotPasswordLink">Forgot password?</a>
+        </p>
+
+        <button type="submit" class="btn btn-primary auth-submit" id="submitBtn">Sign In</button>
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="lecturer-signup.html">Sign up</a></p>
+      <p class="auth-switch">Are you a student? <a href="student-signin.html">Student sign in</a></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase (compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+
+<script src="../js/common.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

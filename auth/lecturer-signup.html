@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Lecturer Sign Up</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- Branding panel -->
+  <div class="auth-visual">
+    <div class="logo"><i class="fa-solid fa-user-check"></i><h2>AttendPro</h2></div>
+    <div class="pitch">
+      <h1>Create your lecturer account</h1>
+      <p>Your department admin issues a Staff ID before you can sign up — this keeps lecturer accounts restricted to approved staff.</p>
+    </div>
+    <div class="pitch-foot">&copy; 2026 AttendPro</div>
+  </div>
+
+  <!-- Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+
+      <div class="role-tabs">
+        <a href="student-signup.html">Student</a>
+        <a href="lecturer-signup.html" class="active">Lecturer</a>
+      </div>
+
+      <h1>Lecturer Sign Up</h1>
+      <p class="subtitle">Your Staff ID must already be registered by your admin.</p>
+
+      <div id="formAlert" class="form-alert" hidden></div>
+
+      <form id="lecturerSignupForm" novalidate>
+
+        <div class="photo-upload">
+          <div class="photo-preview" id="photoPreview"><i class="fa-solid fa-camera"></i></div>
+          <div class="photo-upload-controls">
+            <label class="btn btn-outline btn-sm" for="passportPhoto">Upload Passport Photograph</label>
+            <input type="file" id="passportPhoto" name="passportPhoto" data-field="passportPhoto" accept="image/*" required>
+            <p class="field-hint">Clear, front-facing photo. JPG or PNG.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="staffId">Staff ID</label>
+          <input type="text" id="staffId" name="staffId" data-field="staffId" placeholder="e.g. LEC001" required>
+          <p class="field-hint">Issued by your admin — accounts can only be created for pre-approved Staff IDs.</p>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" data-field="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" data-field="firstName" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="middleName">Middle Name</label>
+          <input type="text" id="middleName" name="middleName" data-field="middleName">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Institutional Email</label>
+          <input type="email" id="email" name="email" data-field="email" required>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input type="password" id="password" name="password" data-field="password" required minlength="8">
+              <button type="button" class="password-toggle" data-toggle-for="password"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-field">
+              <input type="password" id="confirmPassword" name="confirmPassword" data-field="confirmPassword" required minlength="8">
+              <button type="button" class="password-toggle" data-toggle-for="confirmPassword"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit" id="submitBtn">Create Lecturer Account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="lecturer-signin.html">Sign in</a></p>
+      <p class="auth-switch">Are you a student? <a href="student-signup.html">Student sign up</a></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase (compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+
+<script src="../js/common.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

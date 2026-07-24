@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Admin Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<!-- ================= LOADING / ERROR ================= -->
+<div id="loadingState" class="center-screen">
+  <div style="text-align:center;">
+    <div class="spinner"></div>
+    <p class="muted">Loading dashboard...</p>
+  </div>
+</div>
+
+<div id="errorState" class="center-screen" hidden>
+  <div style="text-align:center; max-width:420px; margin:0 16px;">
+    <i class="fa-solid fa-triangle-exclamation txt-red" style="font-size:48px; margin-bottom:16px;"></i>
+    <h2>Error Loading Dashboard</h2>
+    <p id="errorMessage" class="muted" style="margin-bottom:16px;">Failed to load dashboard data. Please try again.</p>
+    <button class="btn btn-primary" id="retryBtn">Retry</button>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboardRoot" class="dashboard" hidden>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fa-solid fa-user-check"></i>
+      <h2>AttendPro</h2>
+    </div>
+
+    <ul class="menu">
+      <li class="menu-item" data-page="dashboard" data-title="Admin Dashboard">
+        <a href="#dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+      </li>
+      <li class="menu-item" data-page="students" data-title="Students Management">
+        <a href="#students"><i class="fa-solid fa-user-graduate"></i><span>Students</span></a>
+      </li>
+      <li class="menu-item" data-page="lecturers" data-title="Lecturers Management">
+        <a href="#lecturers"><i class="fa-solid fa-users"></i><span>Lecturers</span></a>
+      </li>
+      <li class="menu-item" data-page="attendance" data-title="Attendance Management">
+        <a href="#attendance"><i class="fa-solid fa-calendar-check"></i><span>Attendance</span></a>
+      </li>
+      <li class="menu-item" data-page="courses" data-title="Course Management">
+        <a href="#courses"><i class="fa-solid fa-book"></i><span>Courses</span></a>
+      </li>
+      <li class="menu-item" data-page="reports" data-title="Reports">
+        <a href="#reports"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+      </li>
+      <li class="menu-item" data-page="settings" data-title="System Settings">
+        <a href="#settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <h1 class="page-title">Admin Dashboard</h1>
+      <div class="profile">
+        <button class="icon-btn" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-badge" data-field="notifCount" hidden></span>
+        </button>
+        <img class="avatar" data-field="avatarUrl" src="https://i.pravatar.cc/45" alt="">
+        <span class="user-name" data-field="userName">Administrator</span>
+        <button class="icon-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <!-- ============ DASHBOARD PAGE ============ -->
+    <section id="dashboard" class="page">
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-blue"><i class="fa-solid fa-user-graduate"></i></div>
+            <span class="card-label">Total Students</span>
+          </div>
+          <h2 class="card-value" data-field="totalStudents">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-green"><i class="fa-solid fa-calendar-check"></i></div>
+            <span class="card-label">Present Today</span>
+          </div>
+          <h2 class="card-value" data-field="presentToday">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-red"><i class="fa-solid fa-user-xmark"></i></div>
+            <span class="card-label">Absent</span>
+          </div>
+          <h2 class="card-value" data-field="absentToday">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-cyan"><i class="fa-solid fa-chart-pie"></i></div>
+            <span class="card-label">Attendance Rate</span>
+          </div>
+          <h2 class="card-value" data-field="attendanceRate">0%</h2>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" data-action="add-student"><i class="fa-solid fa-user-plus"></i>Add Student</button>
+        <button class="btn btn-outline" data-action="create-course"><i class="fa-solid fa-book"></i>Create Course</button>
+        <button class="btn btn-outline" data-action="mark-attendance"><i class="fa-solid fa-calendar-check"></i>Mark Attendance</button>
+        <button class="btn btn-outline" data-action="generate-report"><i class="fa-solid fa-file-arrow-down"></i>Generate Report</button>
+      </div>
+
+      <div class="table-area">
+        <div class="table-header"><h2>Recent Attendance</h2></div>
+        <table class="data-table" id="recentAttendanceTable">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentAttendanceBody"></tbody>
+        </table>
+        <div class="table-empty" id="recentAttendanceEmpty" hidden>
+          <i class="fa-regular fa-calendar"></i>
+          <p>No attendance records yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STUDENTS PAGE ============ -->
+    <section id="students" class="page">
+      <div class="section-title">
+        <h2>Students Management</h2>
+        <button class="btn btn-primary" data-action="add-student"><i class="fa-solid fa-user-plus"></i>Add Student</button>
+      </div>
+
+      <div class="table-area">
+        <table class="data-table" id="studentsTable">
+          <thead>
+            <tr>
+              <th>Matric No</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Level</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="studentsBody"></tbody>
+        </table>
+        <div class="table-empty" id="studentsEmpty" hidden>
+          <i class="fa-solid fa-user-graduate"></i>
+          <p>No students found</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LECTURERS PAGE ============ -->
+    <section id="lecturers" class="page">
+      <div class="section-title">
+        <h2>Lecturers Management</h2>
+        <button class="btn btn-primary" data-action="add-lecturer"><i class="fa-solid fa-user-plus"></i>Add Lecturer</button>
+      </div>
+
+      <!-- A lecturer can only self-signup if their Staff ID + email
+           are added here first (see auth/lecturer-signup.html). -->
+      <div class="settings-card mb-3">
+        <h3 class="mb-1">Pre-approve a Lecturer</h3>
+        <p class="field-hint mb-2">Add a Staff ID + email here before a lecturer can create their account.</p>
+        <form id="allowlistForm">
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label for="allowlistStaffId">Staff ID</label>
+              <input type="text" id="allowlistStaffId" placeholder="e.g. LEC001" required>
+            </div>
+            <div class="form-group">
+              <label for="allowlistEmail">Email</label>
+              <input type="email" id="allowlistEmail" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="allowlistSubmitBtn">Add to Allowlist</button>
+        </form>
+        <div id="allowlistAlert" class="form-alert" hidden style="margin-top:14px;"></div>
+      </div>
+
+      <div class="table-area">
+        <table class="data-table" id="lecturersTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="lecturersBody"></tbody>
+        </table>
+        <div class="table-empty" id="lecturersEmpty" hidden>
+          <i class="fa-solid fa-users"></i>
+          <p>No lecturers found</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ATTENDANCE PAGE ============ -->
+    <section id="attendance" class="page">
+      <div class="section-title"><h2>Attendance Management</h2></div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-blue"><i class="fa-solid fa-calendar-day"></i></div>
+            <span class="card-label">Sessions Today</span>
+          </div>
+          <h2 class="card-value" data-field="sessionsToday">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+            <span class="card-label">Present</span>
+          </div>
+          <h2 class="card-value" data-field="presentToday">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-red"><i class="fa-solid fa-circle-xmark"></i></div>
+            <span class="card-label">Absent</span>
+          </div>
+          <h2 class="card-value" data-field="absentToday">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COURSES PAGE ============ -->
+    <section id="courses" class="page">
+      <div class="section-title">
+        <h2>Course Management</h2>
+        <button class="btn btn-primary" data-action="create-course"><i class="fa-solid fa-plus"></i>Create Course</button>
+      </div>
+
+      <div class="settings-card mb-3">
+        <h3 class="mb-1">Create a Course</h3>
+        <p class="field-hint mb-2">Courses appear in the assigned lecturer's session picker so they can start attendance.</p>
+        <form id="courseForm">
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label for="courseCode">Course Code</label>
+              <input type="text" id="courseCode" placeholder="e.g. CSC101" required>
+            </div>
+            <div class="form-group">
+              <label for="courseTitle">Course Title</label>
+              <input type="text" id="courseTitle" placeholder="e.g. Introduction to Computing" required>
+            </div>
+          </div>
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label for="courseDepartment">Department</label>
+              <input type="text" id="courseDepartment" placeholder="e.g. Computer Science">
+            </div>
+            <div class="form-group">
+              <label for="courseLecturer">Lecturer</label>
+              <select id="courseLecturer" required>
+                <option value="">Select a lecturer</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="courseSubmitBtn">Create Course</button>
+        </form>
+        <div id="courseAlert" class="form-alert" hidden style="margin-top:14px;"></div>
+      </div>
+
+      <div class="table-area">
+        <table class="data-table" id="coursesTable">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Course</th>
+              <th>Department</th>
+              <th>Lecturer</th>
+            </tr>
+          </thead>
+          <tbody id="coursesBody"></tbody>
+        </table>
+        <div class="table-empty" id="coursesEmpty" hidden>
+          <i class="fa-solid fa-book"></i>
+          <p>No courses found</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REPORTS PAGE ============ -->
+    <section id="reports" class="page">
+      <div class="section-title"><h2>Reports</h2></div>
+
+      <div class="report-box">
+        <h1 class="report-value" data-field="overallAttendanceRate">0%</h1>
+        <p>Overall Attendance Rate</p>
+        <button class="btn btn-primary" data-action="download-report"><i class="fa-solid fa-download"></i>Download Report</button>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS PAGE ============ -->
+    <section id="settings" class="page">
+      <div class="section-title"><h2>System Settings</h2></div>
+
+      <div class="settings-card">
+        <div class="form-group">
+          <label for="systemName">System Name</label>
+          <input type="text" id="systemName" data-field="systemName" value="AttendPro">
+        </div>
+        <div class="form-group">
+          <label for="institutionName">Institution Name</label>
+          <input type="text" id="institutionName" data-field="institutionName" value="Dennis Osadebay University">
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     ROW TEMPLATES — cloned by js/admin.js and filled via
+     applyData() using the [data-field] spans below.
+============================================================= -->
+<template id="attendanceRowTemplate">
+  <tr>
+    <td><span data-field="studentName"></span></td>
+    <td><span data-field="courseName"></span></td>
+    <td><span data-field="date"></span></td>
+    <td><span class="status-badge" data-field="status"></span></td>
+  </tr>
+</template>
+
+<template id="studentRowTemplate">
+  <tr>
+    <td><span data-field="matricNo"></span></td>
+    <td><span data-field="name"></span></td>
+    <td><span data-field="department"></span></td>
+    <td><span data-field="level"></span></td>
+    <td><span class="status-badge" data-field="status"></span></td>
+    <td class="row-actions">
+      <button class="btn btn-sm btn-edit" data-action="edit-student" data-field="id">Edit</button>
+      <button class="btn btn-sm btn-delete" data-action="delete-student" data-field="id">Delete</button>
+    </td>
+  </tr>
+</template>
+
+<template id="lecturerRowTemplate">
+  <tr>
+    <td><span data-field="lecturerId"></span></td>
+    <td><span data-field="name"></span></td>
+    <td><span data-field="email"></span></td>
+    <td><span data-field="department"></span></td>
+    <td class="row-actions">
+      <button class="btn btn-sm btn-edit" data-action="edit-lecturer" data-field="id">Edit</button>
+      <button class="btn btn-sm btn-delete" data-action="delete-lecturer" data-field="id">Delete</button>
+    </td>
+  </tr>
+</template>
+
+<template id="courseRowTemplate">
+  <tr>
+    <td><span data-field="code"></span></td>
+    <td><span data-field="title"></span></td>
+    <td><span data-field="department"></span></td>
+    <td><span data-field="lecturerName"></span></td>
+  </tr>
+</template>
+
+<!-- Firebase (compat SDK) — needed for the "pre-approve a lecturer" form -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

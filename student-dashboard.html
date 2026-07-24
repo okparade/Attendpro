@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Student Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<!-- ================= LOADING / ERROR ================= -->
+<div id="loadingState" class="center-screen">
+  <div style="text-align:center;">
+    <div class="spinner"></div>
+    <p class="muted">Loading dashboard...</p>
+  </div>
+</div>
+
+<div id="errorState" class="center-screen" hidden>
+  <div style="text-align:center; max-width:420px; margin:0 16px;">
+    <i class="fa-solid fa-triangle-exclamation txt-red" style="font-size:48px; margin-bottom:16px;"></i>
+    <h2>Error Loading Dashboard</h2>
+    <p id="errorMessage" class="muted" style="margin-bottom:16px;">Failed to load dashboard data. Please try again.</p>
+    <button class="btn btn-primary" id="retryBtn">Retry</button>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboardRoot" class="dashboard" hidden>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fa-solid fa-user-check"></i>
+      <h2>AttendPro</h2>
+    </div>
+
+    <ul class="menu">
+      <li class="menu-item" data-page="dashboard" data-title="Student Dashboard">
+        <a href="#dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+      </li>
+      <li class="menu-item" data-page="sessions" data-title="Open Sessions">
+        <a href="#sessions"><i class="fa-solid fa-clock"></i><span>Open Sessions</span></a>
+      </li>
+      <li class="menu-item" data-page="classes" data-title="My Classes">
+        <a href="#classes"><i class="fa-solid fa-book"></i><span>My Classes</span></a>
+      </li>
+      <li class="menu-item" data-page="attendance" data-title="Attendance History">
+        <a href="#attendance"><i class="fa-solid fa-calendar-check"></i><span>Attendance History</span></a>
+      </li>
+      <li class="menu-item" data-page="sync" data-title="Pending Sync">
+        <a href="#sync"><i class="fa-solid fa-arrows-rotate"></i><span>Pending Sync</span></a>
+      </li>
+      <li class="menu-item" data-page="profile" data-title="Profile">
+        <a href="#profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <h1 class="page-title">Student Dashboard</h1>
+      <div class="profile">
+        <button class="icon-btn" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-badge" data-field="notifCount" hidden></span>
+        </button>
+        <img class="avatar" data-field="avatarUrl" src="https://i.pravatar.cc/45" alt="">
+        <span class="user-name" data-field="userName">Student</span>
+        <button class="icon-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <!-- ============ DASHBOARD PAGE ============ -->
+    <section id="dashboard" class="page">
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-blue"><i class="fa-solid fa-chart-simple"></i></div>
+            <span class="card-label">Total Sessions</span>
+          </div>
+          <h2 class="card-value" data-field="totalSessions">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+            <span class="card-label">Present</span>
+          </div>
+          <h2 class="card-value" data-field="presentCount">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-red"><i class="fa-solid fa-circle-xmark"></i></div>
+            <span class="card-label">Absent</span>
+          </div>
+          <h2 class="card-value" data-field="absentCount">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <span class="card-label">Late</span>
+          </div>
+          <h2 class="card-value" data-field="lateCount">0</h2>
+        </div>
+      </div>
+
+      <div class="rate-card">
+        <div class="rate-top">
+          <div class="rate-title">
+            <i class="fa-solid fa-chart-line txt-blue"></i>
+            <h2>Attendance Rate</h2>
+          </div>
+          <span class="rate-pct" data-field="attendanceRateLabel">0%</span>
+        </div>
+        <div class="track">
+          <div class="fill" id="rateFill" style="width:0%; background-color:#EF4444;"></div>
+        </div>
+      </div>
+
+      <div class="table-area">
+        <div class="table-header">
+          <h2>Recent History</h2>
+        </div>
+        <table class="data-table" id="recentHistoryTable">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Session</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="recentHistoryBody"></tbody>
+        </table>
+        <div class="table-empty" id="recentHistoryEmpty" hidden>
+          <i class="fa-regular fa-calendar"></i>
+          <p>No attendance records yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OPEN SESSIONS PAGE ============ -->
+    <section id="sessions" class="page">
+      <div class="section-title"><h2>Open Sessions</h2></div>
+
+      <div class="table-area">
+        <table class="data-table" id="openSessionsTable">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Lecturer</th>
+              <th>Opened</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="openSessionsBody"></tbody>
+        </table>
+        <div class="table-empty" id="openSessionsEmpty" hidden>
+          <i class="fa-solid fa-clock"></i>
+          <p>No open sessions right now</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MY CLASSES PAGE ============ -->
+    <section id="classes" class="page">
+      <div class="section-title">
+        <h2>My Classes</h2>
+        <button class="btn btn-primary" id="joinClassBtn"><i class="fa-solid fa-plus"></i>Join with Code</button>
+      </div>
+
+      <div class="table-area">
+        <table class="data-table" id="classesTable">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Class</th>
+              <th>Lecturer</th>
+            </tr>
+          </thead>
+          <tbody id="classesBody"></tbody>
+        </table>
+        <div class="table-empty" id="classesEmpty" hidden>
+          <i class="fa-solid fa-book"></i>
+          <p>You haven't joined any classes yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ATTENDANCE HISTORY PAGE ============ -->
+    <section id="attendance" class="page">
+      <div class="section-title"><h2>Attendance History</h2></div>
+
+      <div class="table-area">
+        <table class="data-table" id="attendanceHistoryTable">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Session</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceHistoryBody"></tbody>
+        </table>
+        <div class="table-empty" id="attendanceHistoryEmpty" hidden>
+          <i class="fa-regular fa-calendar"></i>
+          <p>No attendance records yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PENDING SYNC PAGE ============ -->
+    <section id="sync" class="page">
+      <div class="section-title"><h2>Pending Sync</h2></div>
+
+      <div class="table-area">
+        <table class="data-table" id="pendingSyncTable">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Session</th>
+              <th>Recorded</th>
+            </tr>
+          </thead>
+          <tbody id="pendingSyncBody"></tbody>
+        </table>
+        <div class="table-empty" id="pendingSyncEmpty" hidden>
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <p>Everything is synced</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROFILE PAGE ============ -->
+    <section id="profile" class="page">
+      <div class="section-title"><h2>Profile</h2></div>
+
+      <div class="settings-card">
+        <p><strong>Name:</strong> <span data-field="profileName">Student</span></p>
+        <p><strong>Matric No:</strong> <span data-field="profileMatricNo"></span></p>
+        <p><strong>Department:</strong> <span data-field="profileDepartment"></span></p>
+        <p><strong>Email:</strong> <span data-field="profileEmail"></span></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     ROW TEMPLATES — cloned by js/student.js and filled via
+     applyData() using the [data-field] spans below.
+============================================================= -->
+<template id="historyRowTemplate">
+  <tr>
+    <td><span data-field="className"></span></td>
+    <td><span data-field="sessionName"></span></td>
+    <td><span class="status-badge" data-field="status"></span></td>
+    <td><span data-field="date"></span></td>
+  </tr>
+</template>
+
+<template id="openSessionRowTemplate">
+  <tr>
+    <td><span data-field="className"></span></td>
+    <td><span data-field="lecturerName"></span></td>
+    <td><span data-field="openedAt"></span></td>
+    <td><button class="btn btn-sm btn-primary" data-action="check-in" data-field="sessionId">Check In</button></td>
+  </tr>
+</template>
+
+<template id="classRowTemplate">
+  <tr>
+    <td><span data-field="code"></span></td>
+    <td><span data-field="name"></span></td>
+    <td><span data-field="lecturerName"></span></td>
+  </tr>
+</template>
+
+<template id="pendingSyncRowTemplate">
+  <tr>
+    <td><span data-field="className"></span></td>
+    <td><span data-field="sessionName"></span></td>
+    <td><span data-field="recordedAt"></span></td>
+  </tr>
+</template>
+
+<!-- Firebase (compat SDK) — used to load the signed-in student's own record -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/api-config.js"></script>
+
+<script src="js/common.js"></script>
+<script src="js/student.js"></script>
+</body>
+</html>

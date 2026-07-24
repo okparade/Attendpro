@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Check In</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="center-screen">
+  <div class="auth-card" style="max-width:380px; text-align:center; padding:0 20px;">
+    <div class="logo" style="justify-content:center; gap:10px; margin-bottom:24px; color:var(--primary-blue); display:flex; align-items:center;">
+      <i class="fa-solid fa-user-check" style="font-size:22px;"></i>
+      <h2 style="margin:0; font-size:20px; color:var(--gray-800);">AttendPro</h2>
+    </div>
+
+    <div id="statusIcon" style="font-size:40px; color:var(--primary-blue); margin-bottom:16px;">
+      <i class="fa-solid fa-wifi"></i>
+    </div>
+
+    <h1 id="statusTitle" style="font-size:20px; margin-bottom:8px;">Checking you in...</h1>
+    <p id="statusMessage" class="subtitle" style="margin-bottom:24px;">Make sure you're connected to the lecturer's WiFi for this class.</p>
+
+    <div id="formAlert" class="form-alert" hidden></div>
+
+    <!-- Shown only if there's no existing session (e.g. QR opened
+         in a fresh browser/incognito tab) -->
+    <form id="matNoForm" hidden>
+      <div class="form-group" style="text-align:left;">
+        <label for="matNo">Matric Number</label>
+        <input type="text" id="matNo" name="matNo" placeholder="e.g. DOU/SE/001" required>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit" id="submitBtn">Check In</button>
+    </form>
+
+    <a href="index.html" class="auth-switch" style="display:block;">Back to home</a>
+  </div>
+</div>
+
+<script src="js/api-config.js"></script>
+<script src="js/checkin.js"></script>
+</body>
+</html>

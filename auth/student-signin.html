@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Student Sign In</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- Branding panel -->
+  <div class="auth-visual">
+    <div class="logo"><i class="fa-solid fa-user-check"></i><h2>AttendPro</h2></div>
+    <div class="pitch">
+      <h1>Welcome back</h1>
+      <p>Enter your matric number and we'll email you a one-time code to sign in — no password needed.</p>
+    </div>
+    <div class="pitch-foot">&copy; 2026 AttendPro</div>
+  </div>
+
+  <!-- Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+
+      <div class="role-tabs">
+        <a href="student-signin.html" class="active">Student</a>
+        <a href="lecturer-signin.html">Lecturer</a>
+      </div>
+
+      <h1>Student Sign In</h1>
+      <p class="subtitle" id="signinSubtitle">Enter your matric number to get a sign-in code.</p>
+
+      <div id="formAlert" class="form-alert" hidden></div>
+
+      <!-- STEP 1: matric number -->
+      <form id="matNoForm" novalidate>
+        <div class="form-group">
+          <label for="matNo">Matric Number</label>
+          <input type="text" id="matNo" name="matNo" data-field="matNo" placeholder="e.g. DOU/SE/001" required>
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit" id="sendCodeBtn">Send Sign-in Code</button>
+      </form>
+
+      <!-- STEP 2: one-time code (hidden until code is requested) -->
+      <form id="otpForm" novalidate hidden>
+        <p class="field-hint" style="margin-bottom:14px;">
+          Code sent to <strong id="maskedEmail" data-field="maskedEmail">your email</strong>.
+        </p>
+        <div class="otp-boxes">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit">
+        </div>
+        <div class="resend-row">
+          <span class="muted" id="resendTimer">Resend code in 30s</span>
+          <button type="button" id="resendBtn" disabled>Resend code</button>
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit" id="verifyBtn">Verify &amp; Sign In</button>
+        <p class="auth-switch"><a href="#" id="changeMatNoLink">Use a different matric number</a></p>
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="student-signup.html">Sign up</a></p>
+      <p class="auth-switch">Are you a lecturer? <a href="lecturer-signin.html">Lecturer sign in</a></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase (compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+
+<script src="../js/common.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

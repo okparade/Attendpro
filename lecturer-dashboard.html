@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendPro - Lecturer Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<!-- ================= LOADING / ERROR ================= -->
+<div id="loadingState" class="center-screen">
+  <div style="text-align:center;">
+    <div class="spinner"></div>
+    <p class="muted">Loading dashboard...</p>
+  </div>
+</div>
+
+<div id="errorState" class="center-screen" hidden>
+  <div style="text-align:center; max-width:420px; margin:0 16px;">
+    <i class="fa-solid fa-triangle-exclamation txt-red" style="font-size:48px; margin-bottom:16px;"></i>
+    <h2>Error Loading Dashboard</h2>
+    <p id="errorMessage" class="muted" style="margin-bottom:16px;">Failed to load dashboard data. Please try again.</p>
+    <button class="btn btn-primary" id="retryBtn">Retry</button>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboardRoot" class="dashboard" hidden>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fa-solid fa-user-check"></i>
+      <h2>AttendPro</h2>
+    </div>
+
+    <ul class="menu">
+      <li class="menu-item" data-page="dashboard" data-title="Lecturer Dashboard">
+        <a href="#dashboard"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+      </li>
+      <li class="menu-item" data-page="courses" data-title="My Courses">
+        <a href="#courses"><i class="fa-solid fa-book"></i><span>My Courses</span></a>
+      </li>
+      <li class="menu-item" data-page="session" data-title="Attendance Session">
+        <a href="#session"><i class="fa-solid fa-qrcode"></i><span>Attendance Session</span></a>
+      </li>
+      <li class="menu-item" data-page="history" data-title="Attendance History">
+        <a href="#history"><i class="fa-solid fa-calendar-check"></i><span>Attendance History</span></a>
+      </li>
+      <li class="menu-item" data-page="reports" data-title="Reports">
+        <a href="#reports"><i class="fa-solid fa-chart-column"></i><span>Reports</span></a>
+      </li>
+      <li class="menu-item" data-page="profile" data-title="Profile">
+        <a href="#profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <h1 class="page-title">Lecturer Dashboard</h1>
+      <div class="profile">
+        <button class="icon-btn" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-badge" data-field="notifCount" hidden></span>
+        </button>
+        <img class="avatar" data-field="avatarUrl" src="https://i.pravatar.cc/45" alt="">
+        <span class="user-name" data-field="userName">Lecturer</span>
+        <button class="icon-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <!-- ============ DASHBOARD PAGE ============ -->
+    <section id="dashboard" class="page">
+      <div class="cards">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-blue"><i class="fa-solid fa-book"></i></div>
+            <span class="card-label">Courses</span>
+          </div>
+          <h2 class="card-value" data-field="totalCourses">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-green"><i class="fa-solid fa-user-graduate"></i></div>
+            <span class="card-label">Students</span>
+          </div>
+          <h2 class="card-value" data-field="totalStudents">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-amber"><i class="fa-solid fa-calendar-day"></i></div>
+            <span class="card-label">Today's Classes</span>
+          </div>
+          <h2 class="card-value" data-field="todaysClasses">0</h2>
+        </div>
+        <div class="card">
+          <div class="card-top">
+            <div class="card-icon card-icon-cyan"><i class="fa-solid fa-chart-pie"></i></div>
+            <span class="card-label">Attendance</span>
+          </div>
+          <h2 class="card-value" data-field="attendanceRate">0%</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MY COURSES PAGE ============ -->
+    <section id="courses" class="page">
+      <div class="section-title"><h2>My Courses</h2></div>
+
+      <div class="table-area">
+        <table class="data-table" id="coursesTable">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Title</th>
+              <th>Students</th>
+            </tr>
+          </thead>
+          <tbody id="coursesBody"></tbody>
+        </table>
+        <div class="table-empty" id="coursesEmpty" hidden>
+          <i class="fa-solid fa-book"></i>
+          <p>No courses assigned yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ATTENDANCE SESSION PAGE ============ -->
+    <section id="session" class="page">
+      <div class="section-title"><h2>Attendance Session</h2></div>
+
+      <div class="session-card">
+        <div class="form-group">
+          <label for="sessionCourse">Course</label>
+          <select id="sessionCourse" data-field="sessionCourseId"></select>
+        </div>
+        <div class="actions">
+          <button class="btn btn-success" id="startSessionBtn"><i class="fa-solid fa-play"></i>Start Attendance</button>
+          <button class="btn btn-outline" id="endSessionBtn" disabled><i class="fa-solid fa-stop"></i>End Attendance</button>
+        </div>
+
+        <p class="field-hint mb-1" id="sessionStatus" hidden></p>
+
+        <div id="qrWrap" hidden style="text-align:center; margin-top:16px;">
+          <img id="qrImage" alt="Attendance QR code" style="width:220px; height:220px; border-radius:var(--radius-sm); border:1px solid var(--gray-200);">
+          <p class="field-hint mt-1">Students can scan this, or check in from their own Open Sessions list.</p>
+        </div>
+      </div>
+
+      <div class="table-area" style="margin-top:24px;">
+        <div class="table-header"><h2>Live Attendance Feed</h2></div>
+        <table class="data-table" id="liveFeedTable">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="liveFeedBody"></tbody>
+        </table>
+        <div class="table-empty" id="liveFeedEmpty" hidden>
+          <i class="fa-solid fa-qrcode"></i>
+          <p>No check-ins yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ATTENDANCE HISTORY PAGE ============ -->
+    <section id="history" class="page">
+      <div class="section-title"><h2>Attendance History</h2></div>
+
+      <div class="table-area">
+        <table class="data-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Course</th>
+              <th>Present</th>
+              <th>Absent</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+        <div class="table-empty" id="historyEmpty" hidden>
+          <i class="fa-regular fa-calendar"></i>
+          <p>No attendance history yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REPORTS PAGE ============ -->
+    <section id="reports" class="page">
+      <div class="section-title"><h2>Reports</h2></div>
+
+      <div class="report-box">
+        <h1 class="report-value" data-field="overallAttendanceRate">0%</h1>
+        <p>Overall Attendance</p>
+        <button class="btn btn-primary" id="exportReportBtn"><i class="fa-solid fa-file-pdf"></i>Export PDF</button>
+      </div>
+    </section>
+
+    <!-- ============ PROFILE PAGE ============ -->
+    <section id="profile" class="page">
+      <div class="section-title"><h2>Profile</h2></div>
+
+      <div class="settings-card">
+        <p><strong>Name:</strong> <span data-field="profileName">Lecturer</span></p>
+        <p><strong>Department:</strong> <span data-field="profileDepartment"></span></p>
+        <p><strong>Email:</strong> <span data-field="profileEmail"></span></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     ROW TEMPLATES — cloned by js/lecturer.js and filled via
+     applyData() using the [data-field] spans below.
+============================================================= -->
+<template id="courseRowTemplate">
+  <tr>
+    <td><span data-field="code"></span></td>
+    <td><span data-field="title"></span></td>
+    <td><span data-field="studentCount"></span></td>
+  </tr>
+</template>
+
+<template id="liveFeedRowTemplate">
+  <tr>
+    <td><span data-field="studentName"></span></td>
+    <td><span data-field="time"></span></td>
+    <td><span class="status-badge" data-field="status"></span></td>
+  </tr>
+</template>
+
+<template id="historyRowTemplate">
+  <tr>
+    <td><span data-field="date"></span></td>
+    <td><span data-field="courseCode"></span></td>
+    <td><span data-field="presentCount"></span></td>
+    <td><span data-field="absentCount"></span></td>
+  </tr>
+</template>
+
+<!-- Firebase (compat SDK) — needed to guard this page and sign out -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/api-config.js"></script>
+
+<script src="js/common.js"></script>
+<script src="js/lecturer.js"></script>
+</body>
+</html>
