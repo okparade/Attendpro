@@ -98,7 +98,7 @@ async function loadStudentDashboard() {
     console.log('Hiding loading state...');
     const loadingEl = document.getElementById('loadingState');
     if (loadingEl) {
-      loadingEl.style.display = 'none';
+      loadingEl.hidden = true;
       console.log('Loading state hidden');
     } else {
       console.log('Loading state element not found');
@@ -107,7 +107,7 @@ async function loadStudentDashboard() {
     console.log('Hiding error state...');
     const errorEl = document.getElementById('errorState');
     if (errorEl) {
-      errorEl.style.display = 'none';
+      errorEl.hidden = true;
       console.log('Error state hidden');
     } else {
       console.log('Error state element not found');
@@ -116,6 +116,7 @@ async function loadStudentDashboard() {
     console.log('Showing dashboard root...');
     const rootEl = document.getElementById('dashboardRoot');
     if (rootEl) {
+      rootEl.hidden = false;
       rootEl.style.display = 'flex';
       console.log('Dashboard root shown');
     } else {
