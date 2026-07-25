@@ -42,11 +42,11 @@ const [profile, sessions, openSessions, enrollments] = await Promise.all([
     if (!profile) throw new Error('profile-not-found');
 
 
-  const myCourses = [];
+const myCourses = [];
 
 for (const enrollment of enrollments) {
 
-  const course = await dbGet(
+const course = await dbGet(
     "courses",
     enrollment.courseId
   );
