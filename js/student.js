@@ -23,7 +23,6 @@ document.getElementById('logoutBtn')?.addEventListener('click', () => {
 async function loadStudentDashboard() {
   setViewState({ loading: true, error: null });
   const matNo = sessionStorage.getItem('attendpro_matNo');
-  console.log('Loading student dashboard for matNo:', matNo);
   try {
     const [profile, sessions, openSessions] = await Promise.all([
       dbGet('students', matDocId(matNo)),
@@ -31,13 +30,12 @@ async function loadStudentDashboard() {
       dbGetCollection('sessions', ref => ref.where('active', '==', true)),
     ]);
 
-    console.log('Dashboard data loaded:', { profile, sessions, openSessions });
     if (!profile) throw new Error('profile-not-found');
 
     // Profile / topbar — real data from Firestore
     applyData(document, {
       userName: profile.fullName || 'Student',
-      avatarUrl: profile.passportUrl || 'https://i.pravatar.cc/45',
+      avatarUrl: profile.passportUrl || passportUrl,
       profileName: profile.fullName || '',
       profileMatricNo: profile.matNo || matNo,
       profileDepartment: profile.department || '',
@@ -127,6 +125,10 @@ async function loadStudentDashboard() {
     console.error('Error details:', err.message, err.code);
     setViewState({ loading: false, error: 'Failed to load dashboard data. Please try again.' });
   }
+
+  const enrollments = await dbGetCollection("enrollments", ref =>
+  ref.where("matNo", "==", matNo)
+);
 }
 
 /* ------------------------------------------------------------------
@@ -174,8 +176,45 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-document.getElementById('joinClassBtn')?.addEventListener('click', () => {
-  console.log('TODO: open "join class with code" form and POST to /student/classes/join');
+const myCourses = [];
+
+for (const enrollment of enrollments) {
+  const course = await dbGet("courses", enrollment.courseId);
+
+  if (course) {
+    myCourses.push({
+      code: course.courseId,
+      title: course.title,
+      department: course.department,
+      lecturer: course.lecturerStaffId
+    });
+  }
+}
+const joinModal = document.getElementById("joinCourseModal");
+const joinBtn = document.getElementById("joinClassBtn");
+const closeJoinModal = document.getElementById("closeJoinModal");
+
+
+joinBtn?.addEventListener("click", () => {
+
+    joinModal.hidden = false;
+
+});
+
+
+closeJoinModal?.addEventListener("click", () => {
+
+    joinModal.hidden = true;
+
+});
+
+
+joinModal?.addEventListener("click", (e)=>{
+
+    if(e.target === joinModal){
+        joinModal.hidden = true;
+    }
+
 });
 
 document.getElementById('retryBtn')?.addEventListener('click', loadStudentDashboard);

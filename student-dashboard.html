@@ -192,6 +192,54 @@
       </div>
     </section>
 
+    <!-- ================= JOIN COURSE MODAL ================= -->
+<div id="joinCourseModal" class="modal-overlay" hidden>
+
+  <div class="modal-box">
+
+    <button class="modal-close" id="closeJoinModal">
+      &times;
+    </button>
+
+    <h2>Join Course</h2>
+
+    <p class="muted">
+      Enter the course code provided by your lecturer.
+    </p>
+
+    <form id="joinCourseForm">
+
+      <div class="form-group">
+        <label for="courseCodeInput">
+          Course Code
+        </label>
+
+        <input 
+          type="text" 
+          id="courseCodeInput"
+          placeholder="Example: SEN 222"
+          required
+        >
+      </div>
+
+
+      <div id="joinCourseMessage" class="form-alert" hidden></div>
+
+
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        id="joinCourseSubmit"
+      >
+        Join Course
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
     <!-- ============ ATTENDANCE HISTORY PAGE ============ -->
     <section id="attendance" class="page">
       <div class="section-title"><h2>Attendance History</h2></div>
