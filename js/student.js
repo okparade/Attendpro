@@ -42,33 +42,41 @@ const [profile, sessions, openSessions, enrollments] = await Promise.all([
     if (!profile) throw new Error('profile-not-found');
 
 
+
 const myCourses = [];
 
 for (const enrollment of enrollments) {
 
-const course = await dbGet(
-    "courses",
-    enrollment.courseId
-  );
+    const course = await dbGet("courses", enrollment.courseId);
 
-  if (course) {
+    if (course) {
 
-    myCourses.push({
-      code: course.courseId,
-      title: course.title,
-      department: course.department,
-      lecturer: course.lecturerStaffId
-    });
+        myCourses.push({
 
-  }
+            code: course.courseId,
+            title: course.title,
+            department: course.department,
+            lecturer: course.lecturerStaffId
+
+        });
+
+    }
+
 }
 
-console.log("Student courses:", myCourses);
+renderRows({
+
+    tbody: document.getElementById("myClassesBody"),
+    template: document.getElementById("myClassRowTemplate"),
+    rows: myCourses,
+    emptyEl: document.getElementById("myClassesEmpty")
+
+});
 
     // Profile / topbar — real data from Firestore
     applyData(document, {
       userName: profile.fullName || 'Student',
-      avatarUrl: profile.passportUrl || passportUrl,
+      avatarUrl: profile.passportUrl || 'https://i.pravatar.cc/45',
       profileName: profile.fullName || '',
       profileMatricNo: profile.matNo || matNo,
       profileDepartment: profile.department || '',
@@ -205,31 +213,112 @@ document.addEventListener('click', async (e) => {
   }
 });
 
+/* ==========================================================
+   JOIN COURSE MODAL
+========================================================== */
+
 const joinModal = document.getElementById("joinCourseModal");
 const joinBtn = document.getElementById("joinClassBtn");
 const closeJoinModal = document.getElementById("closeJoinModal");
 
-
 joinBtn?.addEventListener("click", () => {
-
+    document.getElementById("joinCourseMessage").hidden = true;
     joinModal.hidden = false;
-
 });
-
 
 closeJoinModal?.addEventListener("click", () => {
-
     joinModal.hidden = true;
+});
 
+joinModal?.addEventListener("click", (e) => {
+    if (e.target === joinModal) {
+        joinModal.hidden = true;
+    }
 });
 
 
-joinModal?.addEventListener("click", (e)=>{
+/* ==========================================================
+   JOIN COURSE
+========================================================== */
 
-    if(e.target === joinModal){
+document.getElementById("joinCourseForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const message = document.getElementById("joinCourseMessage");
+    const submitBtn = document.getElementById("joinCourseSubmit");
+
+    message.hidden = true;
+    submitBtn.disabled = true;
+
+    try {
+
+        const matNo = sessionStorage.getItem("attendpro_matNo");
+
+        if (!matNo) {
+            throw new Error("Student not logged in.");
+        }
+
+        const courseCode = document
+            .getElementById("courseCodeInput")
+            .value
+            .trim()
+            .replace(/\s+/g, " ")
+            .toUpperCase();
+
+        // Check course exists
+        const course = await dbGet("courses", courseCode);
+
+        if (!course) {
+            throw new Error("Course not found.");
+        }
+
+        // Enrollment document id
+        const enrollmentId = `${matNo}_${courseCode}`;
+
+        // Check if already enrolled
+        const existing = await dbGet("enrollments", enrollmentId);
+
+        if (existing) {
+            throw new Error("You have already joined this course.");
+        }
+
+        // Save enrollment
+        await dbSet("enrollments", enrollmentId, {
+
+            matNo: matNo,
+            courseId: courseCode,
+            studentName: sessionStorage.getItem("attendpro_name") || "",
+
+            enrolledAt: firebase.firestore.FieldValue.serverTimestamp()
+
+        });
+
+        message.className = "form-alert success";
+        message.textContent = "Course joined successfully!";
+        message.hidden = false;
+
+        // Close modal
         joinModal.hidden = true;
-    }
 
+        // Clear form
+        document.getElementById("joinCourseForm").reset();
+
+        // Reload dashboard
+        await loadStudentDashboard();
+
+    } catch (err) {
+
+        console.error(err);
+
+        message.className = "form-alert";
+        message.textContent = err.message || "Failed to join course.";
+        message.hidden = false;
+
+    } finally {
+
+        submitBtn.disabled = false;
+
+    }
 });
 
 document.getElementById('retryBtn')?.addEventListener('click', loadStudentDashboard);
