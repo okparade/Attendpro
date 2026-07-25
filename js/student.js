@@ -24,13 +24,46 @@ async function loadStudentDashboard() {
   setViewState({ loading: true, error: null });
   const matNo = sessionStorage.getItem('attendpro_matNo');
   try {
-    const [profile, sessions, openSessions] = await Promise.all([
-      dbGet('students', matDocId(matNo)),
-      dbGetCollection('attendance', ref => ref.where('matNo', '==', matNo)),
-      dbGetCollection('sessions', ref => ref.where('active', '==', true)),
-    ]);
+const [profile, sessions, openSessions, enrollments] = await Promise.all([
+  dbGet('students', matDocId(matNo)),
 
+  dbGetCollection('attendance', ref =>
+    ref.where('matNo', '==', matNo)
+  ),
+
+  dbGetCollection('sessions', ref =>
+    ref.where('active', '==', true)
+  ),
+
+  dbGetCollection('enrollments', ref =>
+    ref.where('matNo', '==', matNo)
+  )
+]);
     if (!profile) throw new Error('profile-not-found');
+
+
+  const myCourses = [];
+
+for (const enrollment of enrollments) {
+
+  const course = await dbGet(
+    "courses",
+    enrollment.courseId
+  );
+
+  if (course) {
+
+    myCourses.push({
+      code: course.courseId,
+      title: course.title,
+      department: course.department,
+      lecturer: course.lecturerStaffId
+    });
+
+  }
+}
+
+console.log("Student courses:", myCourses);
 
     // Profile / topbar — real data from Firestore
     applyData(document, {
@@ -125,10 +158,6 @@ async function loadStudentDashboard() {
     console.error('Error details:', err.message, err.code);
     setViewState({ loading: false, error: 'Failed to load dashboard data. Please try again.' });
   }
-
-  const enrollments = await dbGetCollection("enrollments", ref =>
-  ref.where("matNo", "==", matNo)
-);
 }
 
 /* ------------------------------------------------------------------
@@ -176,20 +205,6 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-const myCourses = [];
-
-for (const enrollment of enrollments) {
-  const course = await dbGet("courses", enrollment.courseId);
-
-  if (course) {
-    myCourses.push({
-      code: course.courseId,
-      title: course.title,
-      department: course.department,
-      lecturer: course.lecturerStaffId
-    });
-  }
-}
 const joinModal = document.getElementById("joinCourseModal");
 const joinBtn = document.getElementById("joinClassBtn");
 const closeJoinModal = document.getElementById("closeJoinModal");
