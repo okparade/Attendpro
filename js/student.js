@@ -64,14 +64,14 @@ for (const enrollment of enrollments) {
 
 }
 
-renderRows({
+// renderRows({
 
-    tbody: document.getElementById("myClassesBody"),
-    template: document.getElementById("myClassRowTemplate"),
-    rows: myCourses,
-    emptyEl: document.getElementById("myClassesEmpty")
+//     tbody: document.getElementById("myClassesBody"),
+//     template: document.getElementById("myClassRowTemplate"),
+//     rows: myCourses,
+//     emptyEl: document.getElementById("myClassesEmpty")
 
-});
+// });
 
     // Profile / topbar — real data from Firestore
     applyData(document, {
