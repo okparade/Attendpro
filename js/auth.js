@@ -256,18 +256,22 @@ otpForm?.addEventListener('submit', async (e) => {
     // Anonymous auth gives the student a real Firebase UID, so
     // Firestore Security Rules can check request.auth.uid against
     // students/{matNo}.authUid on future reads/writes.
-    console.log('Signing in anonymously...');
-    const { user } = await auth.signInAnonymously();
-    console.log('Anonymous auth successful, UID:', user.uid);
+    console.log("Signing in anonymously...");
 
-    // Check current student document state
+    const credential = await auth.signInAnonymously();
+
+    const user = credential.user;
+
+    console.log("Anonymous auth successful, UID:", user.uid);
     const currentStudent = await dbGet('students', matDocId(matNo));
     console.log('Current student document before update:', currentStudent);
-    console.log('Student has authUid?', !!currentStudent.authUid);
+//     console.log('Student has authUid?', !!currentStudent.authUid);
+//     console.log("Current Firebase UID:", user.uid);
+// console.log("UIDs match?", currentStudent.authUid === user.uid);
 
     console.log('Updating student record with authUid...');
     await dbUpdate('students', matDocId(matNo), {
-      authUid: user.uid,
+      // authUid: user.uid,
       lastSignInAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
     console.log('Student record updated successfully');

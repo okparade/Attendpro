@@ -760,3 +760,208 @@ footer p { color: var(--sidebar-text); }
     }
 
 }
+
+/* =====================================================
+   MOBILE RESPONSIVE (Phones)
+===================================================== */
+
+@media (max-width: 768px) {
+
+    body{
+        overflow-x:hidden;
+    }
+
+    /* Dashboard */
+    .dashboard{
+        flex-direction:column;
+    }
+
+    /* Sidebar */
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:relative;
+    }
+
+    .sidebar .logo{
+        justify-content:center;
+        padding:16px;
+    }
+
+    .sidebar .logo h2{
+        display:block;
+        font-size:18px;
+    }
+
+    .menu{
+        display:flex;
+        overflow-x:auto;
+        padding:8px;
+        gap:8px;
+    }
+
+    .menu::-webkit-scrollbar{
+        display:none;
+    }
+
+    .menu-item{
+        flex:0 0 auto;
+        margin:0;
+    }
+
+    .menu-item a{
+        justify-content:center;
+        padding:12px;
+        min-width:60px;
+    }
+
+    .menu-item a span{
+        display:none;
+    }
+
+    /* Main */
+    .main{
+        width:100%;
+    }
+
+    /* Top bar */
+    .topbar{
+        padding:15px;
+        flex-wrap:wrap;
+        gap:12px;
+    }
+
+    .topbar h1{
+        font-size:18px;
+    }
+
+    .profile{
+        width:100%;
+        justify-content:flex-end;
+    }
+
+    /* Pages */
+    .page{
+        padding:15px;
+    }
+
+    /* Cards */
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    /* Section header */
+    .section-title{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .section-title .btn{
+        width:100%;
+        justify-content:center;
+    }
+
+    /* Tables */
+    .table-area{
+        overflow-x:auto;
+    }
+
+    .data-table{
+        min-width:650px;
+    }
+
+    /* Forms */
+    .form-group{
+        max-width:100%;
+    }
+
+    .form-group input,
+    .form-group select{
+        width:100%;
+    }
+
+    /* Settings */
+    .settings-card,
+    .session-card{
+        max-width:100%;
+    }
+
+    /* Attendance Rate */
+    .rate-top{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    /* Modal */
+    .modal-box{
+        width:95%;
+        padding:20px;
+    }
+
+    .modal-close{
+        font-size:24px;
+    }
+
+    /* Buttons */
+    .btn{
+        width:100%;
+        justify-content:center;
+    }
+
+}
+
+
+/* Small phones */
+
+@media (max-width:480px){
+
+    .topbar h1{
+        font-size:16px;
+    }
+
+    .logo h2{
+        font-size:16px !important;
+    }
+
+    .landing-nav{
+        padding:16px;
+    }
+
+    .landing-nav nav{
+        font-size:14px;
+        gap:12px;
+    }
+
+    .card-value{
+        font-size:22px;
+    }
+
+    .rate-pct{
+        font-size:22px;
+    }
+
+    .table-header{
+        padding:14px;
+    }
+
+    .table-header h2{
+        font-size:16px;
+    }
+
+    .modal-box{
+        padding:18px;
+    }
+
+    .otp-boxes{
+        gap:6px;
+    }
+
+    .otp-boxes input{
+        width:40px;
+        height:48px;
+        font-size:18px;
+    }
+
+}
